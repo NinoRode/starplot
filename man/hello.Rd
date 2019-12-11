@@ -1,12 +1,12 @@
-\name{hello}
-\alias{hello}
-\title{Hello, World!}
+\name{starplot}
+\alias{starplot}
+\title{dotplot with stars}
 \usage{
-hello()
+starplot() #not determined yet
 }
 \description{
-Prints 'Hello, world!'.
+Creates a dotplot using stars and polygons.
 }
 \examples{
-hello()
+starplot() #not working yet
 }
