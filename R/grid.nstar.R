@@ -88,9 +88,27 @@ grid.nstar <- function(x=0.5, y=0.5, r=0.5, default.units="npc",
   )
 }
 
+<<<<<<< HEAD
 # star5double <- function() { Treba najti način za neparne zvezde
 #   nstar(5, -1.5)
 # }
+=======
+star5double <- function() {
+  nstar(5, -1.5)
+}
+
+star6double <- function() {
+
+}
+
+star8slim <- function() {
+
+}
+
+star8double <- function() {
+  nstar(8, -0.6)
+}
+>>>>>>> cabd9859fa75497515587aaa0019e5d37d958f6b
 
 vp <- viewport(name = "ta_view")
 pushViewport(vp)
