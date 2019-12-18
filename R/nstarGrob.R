@@ -1,7 +1,7 @@
-##' @aliases ngonGrob grid.ngon ellipseGrob grid.ellipse
-##' @title Regular polygon grob
-##' @description Regular polygons with optional rotation, stretching, and aesthetic attributes.
-##' @describeIn ngonGrob return a polygon grob
+##' @aliases nstarGrob grid.nstar
+##' @title Regular ngram (star) grob
+##' @description Regular ngram (star) with optional rotation and aesthetic attributes.
+##' @describeIn nstarGrob return a ngram (star) grob
 ##' @param x x unit
 ##' @param y y unit
 ##' @param n number of vertices
@@ -18,35 +18,17 @@
 ##' @examples
 ##' library(grid)
 ##' N <- 5
-##' xy <- polygon_regular(N)*2
+##' xy <- star_regular(N)*2
 ##'
-##' # draw multiple polygons
-##' g <- ngonGrob(unit(xy[,1],"cm") + unit(0.5,"npc"),
+##' # draw multiple stars
+##' g <- nstarGrob(unit(xy[,1],"cm") + unit(0.5,"npc"),
 ##'               unit(xy[,2],"cm") + unit(0.5,"npc"),
 ##'               n = seq_len(N) + 2, gp = gpar(fill=1:N))
 ##'
 ##' grid.newpage()
 ##' grid.draw(g)
 ##'
-##' # rotated and stretched
-##' g2 <- ngonGrob(unit(xy[,1],"cm") + unit(0.5,"npc"),
-##'               unit(xy[,2],"cm") + unit(0.5,"npc"),
-##'               n = seq_len(N) + 2, ar = seq_len(N),
-##'               phase = 0, angle = pi/(seq_len(N) + 2),
-##'               size = 1:N + 5)
-##'
-##' grid.newpage()
-##' grid.draw(g2)
-##'
-##' # ellipse
-##' g3 <- ellipseGrob(unit(xy[,1],"cm") + unit(0.5,"npc"),
-##'                   unit(xy[,2],"cm") + unit(0.5,"npc"),
-##'                   angle = -2*seq(0,N-1)*pi/5 + pi/2,
-##'                   size = 5, ar = 1/3)
-##'
-##' grid.newpage()
-##' grid.draw(g3)
-ngonGrob <- function (x, y, n = 5, size = 5, phase = pi/2,
+nstarGrob <- function (x, y, n = 5, size = 5, phase = pi/2,
                       angle = 0, ar = 1,
                       gp = gpar(colour = "black", fill = NA,
                                 linejoin = "mitre"), ...,
@@ -74,7 +56,7 @@ ngonGrob <- function (x, y, n = 5, size = 5, phase = pi/2,
   if (length(ar) < N)
     ar <- rep(ar, length.out = N)
 
-  lngon <- mapply(polygon_regular, n = n, phase = phase,
+  lngon <- mapply(star_regular, n = n, phase = phase,
                   SIMPLIFY = FALSE)
   vertices <- sapply(lngon, nrow)
 
@@ -101,46 +83,30 @@ ngonGrob <- function (x, y, n = 5, size = 5, phase = pi/2,
 
 }
 
-
-#' @describeIn ngonGrob draw a polygon grob on the current device
-#' @inheritParams ngonGrob
+#' @describeIn nstarGrob draw a ngram (star) grob on the current device
+#' @inheritParams nstarGrob
 #' @export
-grid.ngon <- function(...)
+grid.nstar <- function(...)
 {
-  grid.draw(ngonGrob(...))
+  grid.draw(nstarGrob(...))
 }
 
-
-#' @describeIn ngonGrob return an ellipse grob
-#' @inheritParams ngonGrob
+#' @describeIn nstarGrob return the x,y coordinates of a regular polygon inscribed in the unit circle
+#' @inheritParams nstarGrob
 #' @export
-ellipseGrob <- function(x, y, size = 5,
-                        angle = pi/4, ar = 1, n = 50,
-                        gp = gpar(colour = "black", fill = NA,
-                                  linejoin = "mitre"), ...,
-                        position.units = "npc", size.units="mm")  {
-
-  ngonGrob(x, y, n = n , phase = 0,
-           size = size, angle = angle, ar = ar,
-           gp = gp, position.units = position.units,
-           size.units = size.units, ...)
-}
-
-
-#' @describeIn ngonGrob draw an ellipse grob
-#' @inheritParams ngonGrob
-#' @export
-grid.ellipse <- function(...)
-{
-  grid.draw(ellipseGrob(...))
-}
-
-
-#' @describeIn ngonGrob return the x,y coordinates of a regular polygon inscribed in the unit circle
-#' @inheritParams ngonGrob
-#' @export
-polygon_regular <- function(n = 5, phase = 0){
+star_regular <- function(n = 5, phase = 0, ratio = NA){
   stopifnot(n > 2)
+  n <- n * 2
+  pi_n <- pi / (2 * n)
+
+  if (is.na(ratio)) {
+    # Izračunaj ramerje med polmeroma notranjega in zunanjega kroga za pravilno zvezdo
+    # (vert - 4) * pi / (2 * vert) => pol vrha kraka zvezde
+    # (vert + 2) * pi / (2 * vert) => "tretji" kot
+    ratio <- sin((n - 4) * pi_n) / sin((vert + 2) * pi_n)
+  }
+  if (ratio > 1) ratio <- 1 / ratio
+  step <- c(rep(c(1, ratio), vert))
   cc <- exp(seq(0, n)*2i*pi/n) * exp(1i*(phase+pi/2))
-  cbind(Re(cc), Im(cc))
+  cbind(Re(cc), Im(cc)) * step
 }
