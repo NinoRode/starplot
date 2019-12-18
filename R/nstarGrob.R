@@ -60,7 +60,7 @@ nstarGrob <- function (x, y, n = 5, size = 5, phase = pi/2,
                   SIMPLIFY = FALSE)
   vertices <- sapply(lngon, nrow)
 
-  stretch_rotate_move <- function(p, size, ar, angle, x, y){
+  stretch_rotate_move <- function(p, size, ar, angle, x, y){ ####################### TODO: Sort out the positioning and rotation (arround here)
     central <- size * p %*%
       diag(c(sqrt(ar), 1/sqrt(ar))) %*%
       rbind(c(cos(angle), -sin(angle)),
@@ -96,17 +96,15 @@ grid.nstar <- function(...)
 #' @export
 star_regular <- function(n = 5, phase = 0, ratio = NA){
   stopifnot(n > 2)
-  n <- n * 2
-  pi_n <- pi / (2 * n)
+  dbl_n <- n * 2
+  pi_n <- pi / (dbl_n)
 
   if (is.na(ratio)) {
-    # Izračunaj ramerje med polmeroma notranjega in zunanjega kroga za pravilno zvezdo
-    # (vert - 4) * pi / (2 * vert) => pol vrha kraka zvezde
-    # (vert + 2) * pi / (2 * vert) => "tretji" kot
-    ratio <- sin((n - 4) * pi_n) / sin((vert + 2) * pi_n)
+    # Calculate a ratio between the radius of the inner and outer circle for the regular ngon (star).
+    ratio <- sin((n - 4) * pi_n) / sin((n + 2) * pi_n)
   }
   if (ratio > 1) ratio <- 1 / ratio
-  step <- c(rep(c(1, ratio), vert))
-  cc <- exp(seq(0, n)*2i*pi/n) * exp(1i*(phase+pi/2))
+  step <- c(rep(c(1, ratio), dbl_n))
+  cc <- exp(seq(0, dbl_n-1)*2i*pi/dbl_n) * exp(1i*(phase+pi/2))
   cbind(Re(cc), Im(cc)) * step
 }
