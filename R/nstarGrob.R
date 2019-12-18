@@ -1,3 +1,5 @@
+library(grid)
+
 ##' @aliases nstarGrob grid.nstar
 ##' @title Regular ngram (star) grob
 ##' @description Regular ngram (star) with optional rotation and aesthetic attributes.
@@ -108,3 +110,14 @@ star_regular <- function(n = 5, phase = 0, ratio = NA){
   cc <- exp(seq(0, dbl_n-1)*2i*pi/dbl_n) * exp(1i*(phase+pi/2))
   cbind(Re(cc), Im(cc)) * step
 }
+
+N <- 8
+xy <- star_regular(N)*2
+
+# draw multiple stars
+g <- nstarGrob(unit(xy[,1],"cm") + unit(0.5,"npc"),
+              unit(xy[,2],"cm") + unit(0.5,"npc"),
+              n = seq_len(N) + 4, size = 2.3, gp = gpar(fill=1:N))
+
+grid.newpage()
+grid.draw(g)
