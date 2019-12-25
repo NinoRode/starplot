@@ -9,8 +9,8 @@ library(grid)
 ##' @param n number of vertices
 ##' @param size radius of circumscribing circle
 ##' @param phase angle in radians of first point relative to x axis
-##' @param ar aspect ratio
-##' @param angle angle of polygon in radians
+##' @param ar aspect ratio not needed ########################################
+##' @param angle angle of polygon in radians not needed ######################
 ##' @param position.units default units for the positions
 ##' @param size.units grid units for the sizes
 ##' @param gp gpar
@@ -30,11 +30,18 @@ library(grid)
 ##' grid.newpage()
 ##' grid.draw(g)
 ##'
-nstarGrob <- function (x, y, n = 5, size = 5, phase = pi/2,
-                      angle = 0, ar = 1,
-                      gp = gpar(colour = "black", fill = NA,
-                                linejoin = "mitre"), ...,
-                      position.units = "npc", size.units="mm")
+
+# circleGrob <- function(x=0.5, y=0.5, r=0.5,
+#                        default.units="npc",
+#                        name=NULL, gp=gpar(), vp=NULL)
+
+nstarGrob <- function (x = 0.5, y = 0.5, r = 0.5,
+                       default.units = "npc",
+                       n = 5, size = 5, phase = pi/2,                         # size => r
+                       angle = 0, ar = 1,                                     # angle and ar are not needed
+                       gp = gpar(colour = "black", fill = NA,                 # not reallyneeded? default parameters
+                                 linejoin = "mitre"), ...,
+                       position.units = default.units, size.units="mm")       # merge to default units
 {
   N <- length(x)
   stopifnot(length(y) == N)
@@ -112,7 +119,7 @@ star_regular <- function(n = 5, phase = 0, ratio = NA){
 }
 
 N <- 8
-xy <- star_regular(N)*2
+xy <- star_regular(N, ratio = 1)*2
 
 # draw multiple stars
 g <- nstarGrob(unit(xy[,1],"cm") + unit(0.5,"npc"),
