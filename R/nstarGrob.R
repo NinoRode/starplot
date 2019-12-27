@@ -9,8 +9,6 @@ library(grid)
 ##' @param n number of vertices
 ##' @param size radius of circumscribing circle
 ##' @param phase angle in radians of first point relative to x axis
-##' @param ar aspect ratio not needed ########################################
-##' @param angle angle of polygon in radians not needed ######################
 ##' @param position.units default units for the positions
 ##' @param size.units grid units for the sizes
 ##' @param gp gpar
@@ -37,8 +35,7 @@ library(grid)
 
 nstarGrob <- function (x = 0.5, y = 0.5, r = 0.5,
                        default.units = "npc",
-                       n = 5, size = 5, phase = pi/2,                         # size => r
-                       angle = 0, ar = 1,                                     # angle and ar are not needed
+                       n = 5, size = 10, phase = 0,                         # size => r
                        gp = gpar(colour = "black", fill = NA,                 # not reallyneeded? default parameters
                                  linejoin = "mitre"), ...,
                        position.units = default.units, size.units="mm")       # merge to default units
@@ -60,29 +57,21 @@ nstarGrob <- function (x = 0.5, y = 0.5, r = 0.5,
     size <- rep(size, length.out = N)
   if (length(phase) < N)
     phase <- rep(phase, length.out = N)
-  if (length(angle) < N)
-    angle <- rep(angle, length.out = N)
-  if (length(ar) < N)
-    ar <- rep(ar, length.out = N)
 
   lngon <- mapply(star_regular, n = n, phase = phase,
                   SIMPLIFY = FALSE)
   vertices <- sapply(lngon, nrow)
 
-  stretch_rotate_move <- function(p, size, ar, angle, x, y){ ####################### TODO: Sort out the positioning and rotation (arround here)
-    central <- size * p %*%
-      diag(c(sqrt(ar), 1/sqrt(ar))) %*%
-      rbind(c(cos(angle), -sin(angle)),
-            c(sin(angle),  cos(angle)))
+  rotate_move <- function(p, size, x, y){ # Positioning and rotation (arround here)
+    central <- size * p
 
     list(x = unit(central[,1], size.units) + unit(x, position.units),
          y = unit(central[,2], size.units) + unit(y, position.units))
 
   }
 
-  lxy <- mapply(stretch_rotate_move, p=lngon,
-                size=size, ar=ar, angle=angle,
-                x=xv, y=yv,
+  lxy <- mapply(rotate_move, p=lngon,
+                size=size, x=xv, y=yv,
                 SIMPLIFY = FALSE)
 
   allx <- do.call("unit.c", lapply(lxy, "[[", 1))
@@ -119,12 +108,12 @@ star_regular <- function(n = 5, phase = 0, ratio = NA){
 }
 
 N <- 8
-xy <- star_regular(N, ratio = 1)*2
+xy <- star_regular(N / 2, ratio = 1)*2
 
 # draw multiple stars
 g <- nstarGrob(unit(xy[,1],"cm") + unit(0.5,"npc"),
               unit(xy[,2],"cm") + unit(0.5,"npc"),
-              n = seq_len(N) + 4, size = 2.3, gp = gpar(fill=1:N))
+              n = seq_len(N) + 4, size = 5, phase = 0, gp = gpar(fill=1:N))
 
 grid.newpage()
 grid.draw(g)
